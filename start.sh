@@ -16,6 +16,18 @@ P_PLUGINS="${DATA_ROOT}/plugins"
 
 mkdir -p "$P_WORLD" "$P_LOGS" "$P_PLUGINS"
 
+# Copy seed worlds to volume
+# Set FORCE_WORLD_UPLOAD=1 in Railway env vars to overwrite existing worlds (one-time update)
+if [ -d /seed-worlds ]; then
+  for wld in /seed-worlds/*.wld; do
+    [ -f "$wld" ] || continue
+    dest="$P_WORLD/$(basename "$wld")"
+    if [ ! -f "$dest" ] || [ "${FORCE_WORLD_UPLOAD:-0}" = "1" ]; then
+      cp "$wld" "$dest"
+    fi
+  done
+fi
+
 # Remplace un dossier par un symlink vers le volume
 link_dir() {
   src="$1"
