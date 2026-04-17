@@ -91,6 +91,18 @@ for a in "$@"; do
   esac
 done
 
+# Grant gameplay permissions to the default group (runs every startup, idempotent)
+TSHOCK_DB="${P_WORLD}/tshock.sqlite"
+if [ -f "$TSHOCK_DB" ] && command -v sqlite3 >/dev/null 2>&1; then
+  PERMS="tshock.npc.summonboss,tshock.npc.startinvasion,tshock.npc.spawnmob,tshock.tp.wormhole,tshock.world.editspawn,tshock.world.time.usesundial,tshock.item.usebanneditem,tshock.npc.invade,tshock.buff.self,tshock.buff.others"
+  sqlite3 "$TSHOCK_DB" "
+    UPDATE GroupList
+    SET Commands = Commands || ',$PERMS'
+    WHERE GroupName = 'default'
+      AND Commands NOT LIKE '%tshock.npc.startinvasion%';
+  " 2>/dev/null || true
+fi
+
 # Lancer exactement comme l'image le prévoit: WORKDIR /tshock + bootstrap.sh :contentReference[oaicite:5]{index=5}
 cd /tshock
 # shellcheck disable=SC2086
