@@ -94,7 +94,7 @@ done
 # Grant gameplay permissions to the default group (runs every startup, idempotent)
 TSHOCK_DB="${P_WORLD}/tshock.sqlite"
 if [ -f "$TSHOCK_DB" ] && command -v sqlite3 >/dev/null 2>&1; then
-  PERMS="tshock.npc.summonboss,tshock.npc.startinvasion,tshock.npc.spawnmob,tshock.tp.wormhole,tshock.world.editspawn,tshock.world.time.usesundial,tshock.item.usebanneditem,tshock.npc.invade,tshock.buff.self,tshock.buff.others"
+  PERMS="tshock.npc.summonboss,tshock.npc.startinvasion,tshock.npc.spawnmob,tshock.tp.wormhole,tshock.world.editspawn,tshock.world.time.usesundial,tshock.item.usebanneditem,tshock.npc.invade,tshock.buff.self,tshock.buff.others,tshock.world.movenpc"
   sqlite3 "$TSHOCK_DB" "
     UPDATE GroupList
     SET Commands = Commands || ',$PERMS'
