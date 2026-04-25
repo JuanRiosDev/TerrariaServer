@@ -94,12 +94,22 @@ done
 # Grant gameplay permissions to the default group (runs every startup, idempotent)
 TSHOCK_DB="${P_WORLD}/tshock.sqlite"
 if [ -f "$TSHOCK_DB" ] && command -v sqlite3 >/dev/null 2>&1; then
-  PERMS="tshock.npc.summonboss,tshock.npc.startinvasion,tshock.npc.spawnmob,tshock.tp.wormhole,tshock.world.editspawn,tshock.world.time.usesundial,tshock.item.usebanneditem,tshock.npc.invade,tshock.buff.self,tshock.buff.others,tshock.world.movenpc"
+  # Block 1 – core gameplay permissions (jefes, invasiones, tiempo, buffs, NPCs)
+  PERMS="tshock.npc.summonboss,tshock.npc.startinvasion,tshock.npc.spawnmob,tshock.tp.wormhole,tshock.world.editspawn,tshock.world.time.*,tshock.world.time.usesundial,tshock.world.time.usemoondial,tshock.item.usebanneditem,tshock.npc.invade,tshock.buff.self,tshock.buff.others,tshock.world.movenpc,tshock.npc.startdd2,tshock.world.events,tshock.npc.hurttown"
   sqlite3 "$TSHOCK_DB" "
     UPDATE GroupList
     SET Commands = Commands || ',$PERMS'
     WHERE GroupName = 'default'
-      AND Commands NOT LIKE '%tshock.npc.startinvasion%';
+      AND Commands NOT LIKE '%tshock.npc.startdd2%';
+  " 2>/dev/null || true
+
+  # Block 2 – teleportation wildcard: Rod of Discord, Hook of Dissonance,
+  #            Magic Mirror, Ice Mirror, Recall Potion, pylons y todos los TP
+  sqlite3 "$TSHOCK_DB" "
+    UPDATE GroupList
+    SET Commands = Commands || ',tshock.tp.rod,tshock.tp.magicmirror,tshock.tp.recall,tshock.tp.*'
+    WHERE GroupName = 'default'
+      AND Commands NOT LIKE '%tshock.tp.rod%';
   " 2>/dev/null || true
 fi
 
